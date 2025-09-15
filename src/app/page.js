@@ -18,6 +18,7 @@ import UserGroup from "@/components/UserGroup";
 import Device from "@/components/Device";
 import Finance from "@/components/Finance";
 import Clients from "@/components/Clients";
+import GSM from "@/components/GSM"; // GSM import
 
 export default function CallengoPage() {
   const [activeMenu, setActiveMenu] = useState("menu");
@@ -40,7 +41,7 @@ export default function CallengoPage() {
       case "systems":
         return <div>Systems Page</div>;
       case "devices":
-        return <Device />;
+        return <Device deviceuid="reg070374605" channels={4} />;
       case "registration":
         return <Registration />;
       case "user-management":
@@ -59,8 +60,6 @@ export default function CallengoPage() {
             userRole={userRole}
           />
         );
-      default:
-        return <div className="text-gray-700 text-lg">Page coming soon</div>;
     }
   };
 
@@ -130,7 +129,6 @@ export default function CallengoPage() {
                 )}
               </button>
 
-              {/* Submenu items */}
               {item.sub && openSubmenus[item.key] && (
                 <div className="ml-6 flex flex-col gap-1 mt-1">
                   {item.sub.map((subItem) => (
