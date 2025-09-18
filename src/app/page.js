@@ -11,6 +11,7 @@ import {
   Menu,
   CreditCard,
   ChevronRight,
+  Smartphone, // optional better icon
 } from "lucide-react";
 
 import Registration from "@/components/Registration";
@@ -18,7 +19,9 @@ import UserGroup from "@/components/UserGroup";
 import Device from "@/components/Device";
 import Finance from "@/components/Finance";
 import Clients from "@/components/Clients";
-import GSM from "@/components/GSM"; // GSM import
+
+import Login from "@/components/Login";
+import DeviceControl from "@/components/DeviceControl";
 
 export default function CallengoPage() {
   const [activeMenu, setActiveMenu] = useState("menu");
@@ -60,6 +63,10 @@ export default function CallengoPage() {
             userRole={userRole}
           />
         );
+      case "device-control": // ✅ New case
+        return <DeviceControl />;
+      default:
+        return <div className="text-gray-500">Select a menu</div>;
     }
   };
 
@@ -76,9 +83,19 @@ export default function CallengoPage() {
       label: "Devices",
       icon: Home,
       key: "devices",
-      sub: ["Device A", "Device B"],
+      sub: ["Device A"],
     },
-    { label: "Registration", icon: UserCog, key: "registration" },
+    {
+      label: "Device Control", // ✅ New menu item
+      icon: Smartphone, // better icon than Cpu/Home
+      key: "device-control",
+    },
+    {
+      label: "Registration",
+      icon: UserCog,
+      key: "registration",
+      sub: ["Overall"],
+    },
     {
       label: "User Management",
       icon: UserCog,
@@ -98,6 +115,7 @@ export default function CallengoPage() {
 
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-slate-100 via-slate-50 to-slate-200 text-slate-800">
+      {/* Sidebar */}
       <aside className="w-64 flex flex-col bg-gray-800 text-gray-200 shadow-lg p-4">
         <div className="p-4 text-2xl font-bold border-b border-gray-700 mb-4">
           Callengo
@@ -147,6 +165,7 @@ export default function CallengoPage() {
         </nav>
       </aside>
 
+      {/* Main content */}
       <main className="flex-1 p-6">{renderMainContent()}</main>
     </div>
   );
