@@ -2,8 +2,7 @@
 import React, { useState } from 'react'
 import { PlusCircle, Edit, Trash2 } from 'lucide-react'
 import MonthlyPayment from './MonthlyPayment'
-
-
+import DeviceControl from "./DeviceControl";
 
 export default function Registration() {
   const [clientName, setClientName] = useState('')
@@ -14,10 +13,31 @@ export default function Registration() {
   const [selectedBlock, setSelectedBlock] = useState(blocks[0])
   const [blockSearch, setBlockSearch] = useState('')
   const [families, setFamilies] = useState([
-    { name: 'John Doe', floor: 1, door: '1', cellphone: '123456789', car: 'ABC123', mobile1: '111111', mobile2: '222222', storage: 'S1', parking: 'P1', realEstate: 'RE-001', block: 'Block A' },
+    { 
+      name: 'John Doe',
+      floor: 1,
+      door: '1',
+      cellphone: '123456789',
+      car: 'ABC123',
+      mobile1: '111111',
+      mobile2: '222222',
+      storage: 'S1',
+      parking: 'P1',
+      realEstate: 'RE-001',
+      block: 'Block A',
+      username: '',
+      usercode: '',
+      comment: '',
+      monthlyFee: '',
+      unpaidMonths: 0
+    },
   ])
   const [addFamilyOpen, setAddFamilyOpen] = useState(false)
-  const [newFamily, setNewFamily] = useState({ block: selectedBlock, name: '', floor: '', door: '', cellphone: '', car: '', mobile1: '', mobile2: '', storage: '', parking: '', realEstate: '' })
+  const [newFamily, setNewFamily] = useState({ 
+    block: selectedBlock, name: '', floor: '', door: '', cellphone: '', 
+    car: '', mobile1: '', mobile2: '', storage: '', parking: '', realEstate: '',
+    username: '', usercode: '', comment: '', monthlyFee: '', unpaidMonths: 0
+  })
   const [newBlockName, setNewBlockName] = useState('')
   const [editIndex, setEditIndex] = useState(null)
 
@@ -43,7 +63,7 @@ export default function Registration() {
       setFamilies(updated)
       setEditIndex(null)
     } else setFamilies([...families, newFamily])
-    setNewFamily({ block: selectedBlock, name: '', floor: '', door: '', cellphone: '', car: '', mobile1: '', mobile2: '', storage: '', parking: '', realEstate: '' })
+    setNewFamily({ block: selectedBlock, name: '', floor: '', door: '', cellphone: '', car: '', mobile1: '', mobile2: '', storage: '', parking: '', realEstate: '', username: '', usercode: '', comment: '', monthlyFee: '', unpaidMonths: 0 })
     setAddFamilyOpen(false)
   }
   const handleDeleteFamily = (index) => setFamilies(families.filter((_, i) => i !== index))
@@ -119,7 +139,7 @@ export default function Registration() {
         ))}
       </div>
 
-      {/* Family Table Start */}
+      {/* Family Tab */}
       {activeTab === 'family' && (
         <div>
           {/* Add Family Button */}
@@ -163,7 +183,8 @@ export default function Registration() {
               </tbody>
             </table>
           </div>
-                    {/* Pagination Controls */}
+
+          {/* Pagination Controls */}
           <div className="flex justify-between items-center mt-3">
             <div>
               Rows per page:{' '}
@@ -212,11 +233,7 @@ export default function Registration() {
 
       {/* DEVICE CONTROL TAB */}
       {activeTab === 'device' && (
-        <div className="p-4 text-gray-700">
-          <h3 className="text-lg font-semibold mb-3">Device Control</h3>
-          <p>Register and manage devices for the client here.</p>
-          {/* Device table/form can be implemented here */}
-        </div>
+        <DeviceControl families={families} />
       )}
 
       {/* CAMERA CONTROL TAB */}
@@ -224,17 +241,16 @@ export default function Registration() {
         <div className="p-4 text-gray-700">
           <h3 className="text-lg font-semibold mb-3">Camera Control</h3>
           <p>Register and manage cameras for the client here.</p>
-          {/* Camera table/form can be implemented here */}
         </div>
       )}
 
       {/* PAYMENT TAB */}
-     {activeTab === 'payment' && (
-  <div className="p-4">
-    <h3 className="text-lg font-semibold mb-3">Monthly Payment</h3>
-    <MonthlyPayment families={families} selectedBlock={selectedBlock} />
-  </div>
-)}
+      {activeTab === 'payment' && (
+        <div className="p-4">
+          <h3 className="text-lg font-semibold mb-3">Monthly Payment</h3>
+          <MonthlyPayment families={families} selectedBlock={selectedBlock} />
+        </div>
+      )}
     </div>
   )
 }

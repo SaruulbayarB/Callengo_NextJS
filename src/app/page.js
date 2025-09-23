@@ -11,7 +11,6 @@ import {
   Menu,
   CreditCard,
   ChevronRight,
-  Smartphone, // optional better icon
 } from "lucide-react";
 
 import Registration from "@/components/Registration";
@@ -19,9 +18,7 @@ import UserGroup from "@/components/UserGroup";
 import Device from "@/components/Device";
 import Finance from "@/components/Finance";
 import Clients from "@/components/Clients";
-
 import Login from "@/components/Login";
-import DeviceControl from "@/components/DeviceControl";
 
 export default function CallengoPage() {
   const [activeMenu, setActiveMenu] = useState("menu");
@@ -36,9 +33,7 @@ export default function CallengoPage() {
   const renderMainContent = () => {
     switch (activeMenu) {
       case "menu":
-        return (
-          <div className="text-gray-700 text-lg">Dashboard coming soon</div>
-        );
+        return <div className="text-gray-700 text-lg">Dashboard coming soon</div>;
       case "clients":
         return <Clients userRole={userRole} />;
       case "systems":
@@ -63,8 +58,6 @@ export default function CallengoPage() {
             userRole={userRole}
           />
         );
-      case "device-control": // ✅ New case
-        return <DeviceControl />;
       default:
         return <div className="text-gray-500">Select a menu</div>;
     }
@@ -86,15 +79,12 @@ export default function CallengoPage() {
       sub: ["Device A"],
     },
     {
-      label: "Device Control", // ✅ New menu item
-      icon: Smartphone, // better icon than Cpu/Home
-      key: "device-control",
-    },
-    {
       label: "Registration",
       icon: UserCog,
       key: "registration",
-      sub: ["Overall"],
+      sub: [
+        { label: "Overall", key: "registration" }, // ✅ Only Overall remains
+      ],
     },
     {
       label: "User Management",
@@ -151,11 +141,13 @@ export default function CallengoPage() {
                 <div className="ml-6 flex flex-col gap-1 mt-1">
                   {item.sub.map((subItem) => (
                     <button
-                      key={subItem}
-                      onClick={() => setActiveMenu(item.key)}
+                      key={subItem.key || subItem}
+                      onClick={() =>
+                        setActiveMenu(subItem.key || item.key)
+                      }
                       className="text-gray-300 hover:bg-blue-400 hover:text-white px-3 py-1 text-sm rounded-md text-left"
                     >
-                      {subItem}
+                      {subItem.label || subItem}
                     </button>
                   ))}
                 </div>
