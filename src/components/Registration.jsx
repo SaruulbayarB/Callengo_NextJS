@@ -105,14 +105,8 @@ export default function Registration() {
     <div className="w-full px-4 py-3">
       {/* Client Name */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Client Name:</label>
-        <input
-          type="text"
-          value={clientName}
-          onChange={e => setClientName(e.target.value)}
-          placeholder="Enter Client Name"
-          className="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        />
+        <label className="block text-4xl font-medium text-gray-700 mb-1">NEW GARDEN</label>
+    
       </div>
 
       {/* Block Search/Add */}

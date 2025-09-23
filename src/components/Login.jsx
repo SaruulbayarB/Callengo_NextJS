@@ -7,7 +7,7 @@ import {
 
 import Registration from "@/components/Registration";
 import UserGroup from "@/components/UserGroup";
-import Device from "@/components/Device";
+
 import Finance from "@/components/Finance";
 import Clients from "@/components/Clients";
 import Login from "@/components/Login";  // ✅ new import

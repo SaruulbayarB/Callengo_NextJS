@@ -15,9 +15,12 @@ import {
 
 import Registration from "@/components/Registration";
 import UserGroup from "@/components/UserGroup";
-import Device from "@/components/Device";
+import GSM from "@/components/GSM";
+import Camera from "@/components/Camera";
 import Finance from "@/components/Finance";
 import Clients from "@/components/Clients";
+import SystemsGSM from "@/components/SystemsGSM";
+import SystemsClients from "@/components/SystemsClients"; // <-- NEW
 import Login from "@/components/Login";
 
 export default function CallengoPage() {
@@ -36,10 +39,16 @@ export default function CallengoPage() {
         return <div className="text-gray-700 text-lg">Dashboard coming soon</div>;
       case "clients":
         return <Clients userRole={userRole} />;
-      case "systems":
-        return <div>Systems Page</div>;
-      case "devices":
-        return <Device deviceuid="reg070374605" channels={4} />;
+      case "systems-gsm":
+        return <SystemsGSM />;
+      case "systems-camera":
+        return <div>Camera Systems Page</div>;
+      case "systems-clients":  // <-- NEW CASE
+        return <SystemsClients />;
+      case "GSM":
+        return <GSM deviceuid="reg070374605" channels={4} />;
+      case "Camera":
+        return <Camera />;
       case "registration":
         return <Registration />;
       case "user-management":
@@ -70,27 +79,35 @@ export default function CallengoPage() {
       label: "Systems",
       icon: Cpu,
       key: "systems",
-      sub: ["System A", "System B"],
+      sub: [
+        { label: "Systems GSM", key: "systems-gsm" },
+        { label: "Systems Camera", key: "systems-camera" },
+        { label: "Clients & Devices", key: "systems-clients" }, // <-- NEW
+      ],
     },
     {
       label: "Devices",
       icon: Home,
       key: "devices",
-      sub: ["Device A"],
+      sub: [
+        { label: "GSM", key: "GSM" },
+        { label: "Camera", key: "Camera" },
+      ],
     },
     {
       label: "Registration",
       icon: UserCog,
       key: "registration",
-      sub: [
-        { label: "Overall", key: "registration" }, // ✅ Only Overall remains
-      ],
+      sub: [{ label: "Overall", key: "registration" }],
     },
     {
       label: "User Management",
       icon: UserCog,
       key: "user-management",
-      sub: ["Roles", "Permissions"],
+      sub: [
+        { label: "Roles", key: "roles" },
+        { label: "Permissions", key: "permissions" },
+      ],
     },
     { label: "User Group", icon: User, key: "user-group" },
     { label: "Help", icon: HelpCircle, key: "help" },
@@ -99,7 +116,7 @@ export default function CallengoPage() {
       label: "Finance",
       icon: CreditCard,
       key: "finance",
-      sub: ["Monthly Breakdown"],
+      sub: [{ label: "Monthly Breakdown", key: "finance-monthly" }],
     },
   ];
 
@@ -141,13 +158,11 @@ export default function CallengoPage() {
                 <div className="ml-6 flex flex-col gap-1 mt-1">
                   {item.sub.map((subItem) => (
                     <button
-                      key={subItem.key || subItem}
-                      onClick={() =>
-                        setActiveMenu(subItem.key || item.key)
-                      }
+                      key={subItem.key}
+                      onClick={() => setActiveMenu(subItem.key)}
                       className="text-gray-300 hover:bg-blue-400 hover:text-white px-3 py-1 text-sm rounded-md text-left"
                     >
-                      {subItem.label || subItem}
+                      {subItem.label}
                     </button>
                   ))}
                 </div>
