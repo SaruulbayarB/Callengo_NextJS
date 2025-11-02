@@ -2,10 +2,13 @@
 import React, { useState } from "react";
 import { sendDeviceCommand } from "./deviceAPI";
 import { Pencil, Trash, Plus } from "lucide-react";
-import GSMControl from "./GSMControl"; // Right-hand table component
+import GSMControl from "./GSMControl";
+import axios from "axios";
 
-const GSM = () => {
-  const mainDeviceUID = "reg070374605"; // Always present main device
+const BASE_URL = "https://www.svnwi.com/api/external/v1"; // API Base URL
+
+const GSM = ({ apiKey }) => {
+  const mainDeviceUID = "rga070309197"; // Always present main device
   const [devices, setDevices] = useState([
     {
       name: "Main Device",
@@ -14,13 +17,12 @@ const GSM = () => {
       sim: "88986940",
       password: "2503",
       expiry: "2026-10-31",
-      signalStrength: "31",
+      signalStrength: null,
       channels: 1,
       status: "offline",
       channelStatus: [0],
     },
   ]);
-  
 
   const [showModal, setShowModal] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
@@ -35,7 +37,7 @@ const GSM = () => {
 
   const [selectedDeviceIndex, setSelectedDeviceIndex] = useState(0);
 
-  // Handle device commands
+  // --- Handle device commands ---
   const handleCommand = async (deviceIndex, cmdtype, cmdparam, controlnum = 0) => {
     const device = devices[deviceIndex];
     try {
@@ -43,7 +45,7 @@ const GSM = () => {
         deviceuid: device.uid,
         cmdtype,
         cmdparam,
-        ChannelNum: device.channels,
+        channelnum: device.channels,
         controlnum,
       });
       console.log("Device response:", response);
@@ -56,7 +58,30 @@ const GSM = () => {
     }
   };
 
-  // Add/Edit device modal
+  // --- Check signal quality ---
+  const handleCheckSignal = async (deviceIndex) => {
+    const device = devices[deviceIndex];
+    try {
+      const res = await axios.get(`${BASE_URL}/devices/${device.uid}/signal-quality`, {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const quality = res.data?.data?.signalQuality ?? null;
+      const message = res.data?.data?.message ?? "Unknown";
+
+      const newDevices = [...devices];
+      newDevices[deviceIndex].signalStrength = quality;
+      newDevices[deviceIndex].statusMessage = message;
+      setDevices(newDevices);
+    } catch (err) {
+      console.error("Signal check error:", err.message);
+    }
+  };
+
+  // --- Add/Edit device modal ---
   const handleAddEditDevice = (index = null) => {
     if (index !== null) {
       setForm(devices[index]);
@@ -68,9 +93,13 @@ const GSM = () => {
     setShowModal(true);
   };
 
-  // Save device from modal
   const handleSaveDevice = () => {
-    const newDevice = { ...form, status: "offline", channelStatus: Array(form.channels).fill(0) };
+    const newDevice = {
+      ...form,
+      status: "offline",
+      channelStatus: Array(form.channels).fill(0),
+      signalStrength: null,
+    };
     if (editIndex !== null) {
       const newDevices = [...devices];
       newDevices[editIndex] = newDevice;
@@ -81,51 +110,58 @@ const GSM = () => {
     setShowModal(false);
   };
 
-  // Delete device
   const handleDeleteDevice = (index) => {
     const newDevices = [...devices];
     newDevices.splice(index, 1);
     setDevices(newDevices);
-    if (selectedDeviceIndex >= newDevices.length) {
-      setSelectedDeviceIndex(0);
-    }
+    if (selectedDeviceIndex >= newDevices.length) setSelectedDeviceIndex(0);
+  };
+
+  // --- Helper for bar color ---
+  const getBarColor = (value) => {
+    if (value === null) return "bg-gray-300";
+    if (value === 0 || value === 99) return "bg-red-600";
+    if (value <= 9) return "bg-red-400";
+    if (value <= 14) return "bg-yellow-400";
+    if (value <= 19) return "bg-green-400";
+    if (value <= 31) return "bg-green-600";
+    return "bg-gray-300";
   };
 
   return (
     <div className="p-4 flex gap-4">
       {/* LEFT: Device List */}
       <div className="w-120">
-        {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Devices</h2>
-          <button
-            onClick={() => handleAddEditDevice()}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500"
-          >
+          <button onClick={() => handleAddEditDevice()} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
             <Plus className="w-4 h-4" /> Add Device
           </button>
         </div>
 
-        {/* Device list */}
         {devices.map((device, index) => (
-          <div
-            key={index}
-            className={`border p-4 mb-4 rounded shadow bg-white cursor-pointer ${
-              index === selectedDeviceIndex ? "ring-2 ring-blue-500" : ""
-            }`}
-            onClick={() => setSelectedDeviceIndex(index)}
-          >
+          <div key={index} className={`border p-4 mb-4 rounded shadow bg-white cursor-pointer ${index === selectedDeviceIndex ? "ring-2 ring-blue-500" : ""}`} onClick={() => setSelectedDeviceIndex(index)}>
             <div className="flex justify-between items-start">
               <div>
                 <h3 className="font-bold mb-1">{device.name} ({device.model})</h3>
                 <p>Device UID: {device.uid}</p>
                 <p>Sim No.: {device.sim}</p>
                 <p>Password: {device.password}</p>
-                <p>Expiry Date: {device.password}</p>
-                <p>GSM Signal: {device.signalStrength}</p>
+                <p>Expiry Date: {device.expiry}</p>
                 <p>Status: <span className={device.status === "online" ? "text-green-600" : "text-red-600"}>{device.status}</span></p>
-                <div className={`w-20 h-4 mt-1 rounded ${device.channelStatus[0] === 1 ? "bg-green-500" : "bg-gray-300"}`}></div>
+                <p>Signal: {device.signalStrength ?? "-"} ({device.statusMessage ?? "-"})</p>
+
+                {/* Signal bar */}
+                <div className="w-full h-4 bg-gray-200 rounded mt-1">
+                  <div className={`h-4 rounded ${getBarColor(device.signalStrength)}`} style={{ width: device.signalStrength !== null ? `${(device.signalStrength / 31) * 100}%` : "0%" }}></div>
+                </div>
+
+                {/* Signal check button */}
+                <button onClick={() => handleCheckSignal(index)} className="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+                  Check Signal
+                </button>
               </div>
+
               <div className="flex gap-2 mt-1">
                 <button onClick={() => handleAddEditDevice(index)} className="p-1 bg-yellow-300 rounded hover:bg-yellow-400">
                   <Pencil className="w-4 h-4" />
@@ -176,16 +212,10 @@ const GSM = () => {
               <h3 className="text-lg font-bold mb-4">{editIndex !== null ? "Edit Device" : "Add Device"}</h3>
               <div className="flex flex-col gap-2">
                 <input type="text" placeholder="Device Name" className="border p-2 rounded" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-                
-                <select className="border p-2 rounded" value={form.model} onChange={(e) => setForm({
-                  ...form,
-                  model: e.target.value,
-                  channels: e.target.value.startsWith("SM") ? 4 : 1
-                })}>
+                <select className="border p-2 rounded" value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value, channels: e.target.value.startsWith("SM") ? 4 : 1 })}>
                   <option value="SM1-WLTE">SM1-WLTE</option>
                   <option value="GL1-WLTE">GL1-WLTE</option>
                 </select>
-
                 <input type="text" placeholder="Device UID" className="border p-2 rounded" value={form.uid} onChange={(e) => setForm({ ...form, uid: e.target.value })} />
                 <input type="text" placeholder="SIM Number" className="border p-2 rounded" value={form.sim} onChange={(e) => setForm({ ...form, sim: e.target.value })} />
                 <input type="date" className="border p-2 rounded" value={form.expiry} onChange={(e) => setForm({ ...form, expiry: e.target.value })} />

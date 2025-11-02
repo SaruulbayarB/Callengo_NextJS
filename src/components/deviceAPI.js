@@ -1,8 +1,8 @@
 import axios from "axios";
 import qs from "qs";
 
-const API_URL =
-  "https://www.svnwi.com/zycommoninfodeal/thirdPartyHttpHk/thirdpartyhttpcontrol.php";
+const API_URL = "https://www.svnwi.com/api/external/v1";
+// "https://www.svnwi.com/zycommoninfodeal/thirdPartyHttpHk/thirdpartyhttpcontrol.php";
 
 export async function sendDeviceCommand({
   deviceuid,
