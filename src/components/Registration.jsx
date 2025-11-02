@@ -49,7 +49,7 @@ export default function Registration() {
   /** MENU/TABS **/
   const tabs = [
     { id: 'family', label: 'Family' },
-    { id: 'device', label: 'Device Control' },
+    { id: 'device', label: 'GSM Control' },
     { id: 'camera', label: 'Camera Control' },
     { id: 'payment', label: 'Payment' },
   ]

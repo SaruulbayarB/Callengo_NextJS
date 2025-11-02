@@ -11,13 +11,16 @@ const GSM = () => {
       name: "Main Device",
       model: "GL1-WLTE",
       uid: mainDeviceUID,
-      sim: "",
-      expiry: "",
+      sim: "88986940",
+      password: "2503",
+      expiry: "2026-10-31",
+      signalStrength: "31",
       channels: 1,
       status: "offline",
       channelStatus: [0],
     },
   ]);
+  
 
   const [showModal, setShowModal] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
@@ -116,6 +119,10 @@ const GSM = () => {
               <div>
                 <h3 className="font-bold mb-1">{device.name} ({device.model})</h3>
                 <p>Device UID: {device.uid}</p>
+                <p>Sim No.: {device.sim}</p>
+                <p>Password: {device.password}</p>
+                <p>Expiry Date: {device.password}</p>
+                <p>GSM Signal: {device.signalStrength}</p>
                 <p>Status: <span className={device.status === "online" ? "text-green-600" : "text-red-600"}>{device.status}</span></p>
                 <div className={`w-20 h-4 mt-1 rounded ${device.channelStatus[0] === 1 ? "bg-green-500" : "bg-gray-300"}`}></div>
               </div>
